@@ -1,0 +1,16 @@
+test:
+  adapter: postgresql
+  database: mercury_business_test
+  host: localhost
+  pool: 5
+  timeout: 5000
+
+development:
+  adapter: postgresql
+  database: mercury_business_dev
+  host: localhost
+  pool: 5
+  timeout: 5000
+
+production:
+  adapter: postgresql
