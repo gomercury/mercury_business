@@ -2,13 +2,27 @@ module Api
 	module V1
 		class BusinessesController < ApplicationController
 			include ActionController::HttpAuthentication::Token::ControllerMethods
-			before_action :restrict_access
+			before_action :restrict_access, except: [:create]
 			respond_to :json
+
+			def create
+				business = Business.new(business_params)
+				if business.save
+					api_key = ApiKey.new(business_id: business.id)
+					if api_key.save
+						render status: :created, json: { business: business, api_key: api_key }
+					else
+						render status: :bad_request, json: { errors: api_key.errors.full_messages }
+					end
+				else
+					render status: :bad_request, json: { errors: business.errors.full_messages }
+				end
+			end
 
 			def show
 				if business = Business.find_by_id(params[:id])
 					if business == @business
-						render status: :ok, json: business
+						render status: :ok, json: { business: business }
 					else
 						render status: :unauthorized
 					end
@@ -21,7 +35,7 @@ module Api
 				if business = Business.find_by_id(params[:id])
 					if business == @business
 						if business.update_attributes(business_params)
-							render status: :ok, json: business
+							render status: :ok, json: { business: business }
 						else
 							render status: :bad_request, json: { errors: business.errors.full_messages }
 						end
