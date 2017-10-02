@@ -10,24 +10,44 @@ module Api
 				if business.save
 					api_key = ApiKey.new(business_id: business.id)
 					if api_key.save
-						render status: :created, json: { business: business, api_key: api_key }
+						render status: 201, json: { 
+							status: 201,
+							business: business, 
+							api_key: api_key,
+						}
 					else
-						render status: :bad_request, json: { errors: api_key.errors.full_messages }
+						render status: 400, json: { 
+							status: 400,
+							errors: api_key.errors.full_messages,
+							business: business,
+						}
 					end
 				else
-					render status: :bad_request, json: { errors: business.errors.full_messages }
+					render status: 400, json: { 
+						status: 400,
+						errors: business.errors.full_messages,
+					}
 				end
 			end
 
 			def show
 				if business = Business.find_by_id(params[:id])
 					if business == @business
-						render status: :ok, json: { business: business }
+						render status: 200, json: {
+							status: 200,
+							business: business,
+						}
 					else
-						render status: :unauthorized
+						render status: 401, json: {
+							status: 401,
+							errors: ["not authorized"],
+						}
 					end
 				else
-					render status: :not_found
+					render status: 404, json: {
+						status: 404,
+						errors: ["business does not exist"],
+					}
 				end
 			end
 
@@ -35,15 +55,27 @@ module Api
 				if business = Business.find_by_id(params[:id])
 					if business == @business
 						if business.update_attributes(business_params)
-							render status: :ok, json: { business: business }
+							render status: 200, json: { 
+								status: 200,
+								business: business,
+							}
 						else
-							render status: :bad_request, json: { errors: business.errors.full_messages }
+							render status: 400, json: { 
+								status: 400,
+								errors: business.errors.full_messages,
+							}
 						end
 					else
-						render status: :unauthorized
+						render status: 401, json: {
+							status: 401,
+							errors: ["not authorized"],
+						}
 					end
 				else
-					render status: :not_found
+					render status: 404, json: {
+						status: 404,
+						errors: ["business does not exist"],
+					}
 				end
 			end
 
@@ -51,15 +83,26 @@ module Api
 				if business = Business.find_by_id(params[:id])
 					if business == @business
 						if business.destroy
-							render status: :ok
+							render status: 200, json: {
+								status: 200,
+							}
 						else
-							render status: :bad_request, json: { errors: business.errors.full_messages }
+							render status: 400, json: { 
+								status: 400,
+								errors: business.errors.full_messages,
+							}
 						end
 					else
-						render status: :unauthorized
+						render status: 401, json: {
+							status: 401,
+							errors: ["not authorized"],
+						}
 					end
 				else
-					render status: :not_found
+					render status: 404, json: {
+						status: 404,
+						errors: ["business does not exist"],
+					}
 				end
 			end
 
