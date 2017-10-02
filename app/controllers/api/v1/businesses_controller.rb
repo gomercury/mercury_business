@@ -47,6 +47,22 @@ module Api
 				end
 			end
 
+			def destroy
+				if business = Business.find_by_id(params[:id])
+					if business == @business
+						if business.destroy
+							render status: :ok
+						else
+							render status: :bad_request, json: { errors: business.errors.full_messages }
+						end
+					else
+						render status: :unauthorized
+					end
+				else
+					render status: :not_found
+				end
+			end
+
 			private
 
 				def restrict_access

@@ -96,4 +96,39 @@ RSpec.describe Api::V1::BusinessesController, type: :controller do
 			end
 		end
 	end
+
+		describe "DELETE destroy" do
+		context "with valid token" do
+			it "returns updated business" do
+				request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Token.encode_credentials(api_key.access_token)
+				delete :destroy, params: { id: business.id }
+				expect(response).to have_http_status(:ok)
+			end
+		end
+
+		context "with invalid token" do
+			it "returns :unauthorized status code" do
+				request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Token.encode_credentials("INVALID_TOKEN")
+				delete :destroy, params: { id: business.id }
+				expect(response).to have_http_status(:unauthorized)
+			end
+		end
+
+		context "with invalid business 'id'" do
+			it "returns :not_found status code" do
+				request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Token.encode_credentials(api_key.access_token)
+				delete :destroy, params: { id: "INVALID_BUSINESS_ID" }
+				expect(response).to have_http_status(:not_found)
+			end
+		end
+
+		context "with non-matching token and business 'id'" do
+			it "returns :unauthorized status code" do
+				request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Token.encode_credentials(api_key.access_token)
+				alternate_business = FactoryGirl.create(:business)
+				delete :destroy, params: { id: alternate_business.id }
+				expect(response).to have_http_status(:unauthorized)
+			end
+		end
+	end
 end
