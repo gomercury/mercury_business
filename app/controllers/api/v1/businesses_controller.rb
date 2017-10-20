@@ -112,6 +112,12 @@ module Api
 					authenticate_or_request_with_http_token do |token, options|
 						if api_key = ApiKey.find_by_access_token(token)
 							@business = api_key.business
+						elsif
+							render status: 401, json: {
+								status: 401,
+								errors: ["not authorized"],
+							}
+							return
 						end
 					end
 				end
